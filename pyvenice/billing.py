@@ -13,9 +13,13 @@ class InferenceDetails(BaseModel):
     """Details about inference usage."""
 
     requestId: Optional[str] = Field(None, description="Request identifier")
-    inferenceExecutionTime: Optional[int] = Field(None, description="Execution time in milliseconds")
+    inferenceExecutionTime: Optional[int] = Field(
+        None, description="Execution time in milliseconds"
+    )
     promptTokens: Optional[int] = Field(None, description="Number of prompt tokens")
-    completionTokens: Optional[int] = Field(None, description="Number of completion tokens")
+    completionTokens: Optional[int] = Field(
+        None, description="Number of completion tokens"
+    )
     imageCount: Optional[int] = Field(None, description="Number of images generated")
     imageDetails: Optional[Dict[str, Any]] = Field(
         None, description="Image generation details"

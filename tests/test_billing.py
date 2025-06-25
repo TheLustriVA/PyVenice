@@ -114,7 +114,10 @@ class TestBilling:
                     "amount": 1.50,
                     "currency": "USD",
                     "notes": "API Inference",
-                    "inferenceDetails": {"requestId": "test-inference-123", "inferenceExecutionTime": 500},
+                    "inferenceDetails": {
+                        "requestId": "test-inference-123",
+                        "inferenceExecutionTime": 500,
+                    },
                 }
             ],
             "pagination": {"page": 1, "limit": 200, "total": 1, "total_pages": 1},

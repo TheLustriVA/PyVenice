@@ -20,7 +20,9 @@ class Character(BaseModel):
     modelId: Optional[str] = Field(None, description="Model ID for this character")
     shareUrl: Optional[str] = Field(None, description="Public sharing URL")
     stats: Optional[dict] = Field(None, description="Character usage statistics")
-    webEnabled: Optional[bool] = Field(None, description="Whether character is web-enabled")
+    webEnabled: Optional[bool] = Field(
+        None, description="Whether character is web-enabled"
+    )
     id: Optional[str] = Field(None, description="Character ID (alias for slug)")
     slug: str = Field(description="Character slug for API use")
     tags: List[str] = Field(default_factory=list, description="Character tags")

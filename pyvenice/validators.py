@@ -87,15 +87,15 @@ def validate_model_capabilities(
 
             # Check for deprecated parameters first
             # Infer schema name from function/class context
-            schema_name = getattr(self, '_schema_name', 'ChatCompletionRequest')
-            if hasattr(self, '__class__') and 'Chat' in self.__class__.__name__:
-                schema_name = 'ChatCompletionRequest'
-            elif hasattr(self, '__class__') and 'Image' in self.__class__.__name__:
-                schema_name = 'GenerateImageRequest'
-            
+            schema_name = getattr(self, "_schema_name", "ChatCompletionRequest")
+            if hasattr(self, "__class__") and "Chat" in self.__class__.__name__:
+                schema_name = "ChatCompletionRequest"
+            elif hasattr(self, "__class__") and "Image" in self.__class__.__name__:
+                schema_name = "GenerateImageRequest"
+
             # Filter deprecated parameters
             kwargs = check_deprecated_params(schema_name, **kwargs)
-            
+
             # Check each parameter for capability support
             unsupported_params = []
             for param, capability_field in capability_required_params.items():

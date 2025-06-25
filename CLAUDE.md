@@ -13,6 +13,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "pyvenice" - A comprehensive Python client library for the Venice.ai API, providing a wrapper for all API endpoints with type safety, automatic validation, and convenience features.
 
+## User vs Maintainer Separation
+
+**IMPORTANT**: This library has two distinct user groups with different needs:
+
+### **End Users** (Library Consumers)
+- Install via `pip install pyvenice`
+- Use the library for Venice.ai API integration
+- Get clear error messages if version incompatible with API
+- Upgrade library when needed: `pip install --upgrade pyvenice`
+- **Do NOT need**: API monitoring, model updating, or maintainer automation
+
+### **Maintainer** (Library Developer)
+- Monitor Venice.ai API changes via automation scripts
+- Update PyVenice when API evolves
+- Release new versions to PyPI
+- Handle all API compatibility complexity internally
+- **Uses**: All the automation scripts and monitoring tools
+
 ## Development Roadmap
 
 **Note**: Comprehensive roadmap was moved to central project repository.
@@ -45,6 +63,7 @@ The library implements a **decorator-based validation pattern** that requires un
 
 ## Essential Commands
 
+### **For End Users** (Library Development)
 ```bash
 # Development setup
 source .venv/bin/activate      # Activate uv virtual environment
@@ -55,10 +74,22 @@ ruff check .                   # Run linting checks
 ruff check --fix .            # Fix auto-fixable linting issues
 pytest tests/ -m "not integration" --cov=pyvenice --cov-report=term-missing  # Unit tests with coverage
 
+# Testing
+pytest tests/test_chat.py -v  # Run specific test module
+pytest --cov=pyvenice --cov-report=html  # Generate HTML coverage report
+
+# Manual testing
+export VENICE_API_KEY='your-api-key'
+python src/simple_example.py  # Basic functionality test
+python src/example_usage.py   # Comprehensive API demonstration
+```
+
+### **For Maintainer Only** (API Maintenance)
+```bash
 # Security scanning
 scripts/security-scan.sh      # Local security audit (Safety, Bandit, Semgrep)
 
-# API monitoring and automated maintenance (NEW - v0.3.0)
+# API monitoring and automated maintenance (v0.3.0)
 scripts/api-monitor.py         # Check for Venice.ai API changes
 scripts/api-monitor.py --dry-run    # Check without saving changes
 scripts/schema-diff.py --old docs/swagger_old.yaml --new docs/swagger.yaml  # Detailed schema comparison
@@ -79,15 +110,6 @@ scripts/safe-auto-deploy.py --dry-run  # Simulate deployment without changes
 # Distribution testing
 cibuildwheel --platform linux --archs x86_64  # Test wheel building locally
 docker build -t pyvenice:test .               # Test Docker image build
-
-# Testing
-pytest tests/test_chat.py -v  # Run specific test module
-pytest --cov=pyvenice --cov-report=html  # Generate HTML coverage report
-
-# Manual testing
-export VENICE_API_KEY='your-api-key'
-python src/simple_example.py  # Basic functionality test
-python src/example_usage.py   # Comprehensive API demonstration
 ```
 
 ## Development Workflow
@@ -116,13 +138,18 @@ python src/example_usage.py   # Comprehensive API demonstration
 
 ### Project Status & Notes
 
-- **v0.3.0 Release**: COMPLETE AUTOMATED API MAINTENANCE SYSTEM
-- **ADHD/PTSD-Optimized**: Designed for solo dev with review limitations
+- **v0.3.0 Release**: COMPLETE AUTOMATED API MAINTENANCE SYSTEM (Maintainer-Only)
+- **User-Maintainer Separation**: Clear distinction between end-user library and maintainer automation
+- **ADHD/PTSD-Optimized**: Maintainer automation designed for solo dev with review limitations
 - **Zero-Manual-Review Pipeline**: Comprehensive safety validation without human review requirement
 - **Multi-Layered Safety**: 6+ independent validation systems with automatic rollback
 - **AI-Powered Code Generation**: Discrete additive tasks optimized for AI strengths
 - **Complete Observability**: CI/CD feedback loops, failure classification, audit trails
 - **Production-Ready Automation**: Can run unattended with `AUTO_COMMIT=true`
+
+**Architecture Philosophy**:
+- **End Users**: Install library → Use library → Get clear errors if incompatible → Upgrade when needed
+- **Maintainer**: Monitor API → Update library → Release new version → Users benefit automatically
 
 **Previous Infrastructure (v0.2.0)**:
 - **ARM64 Support**: Wheel building solves Android/Termux installation issues  
@@ -162,10 +189,10 @@ python src/example_usage.py   # Comprehensive API demonstration
 
 **For process improvements**: Document in PROCEDURES.md immediately while solution is fresh
 
-## Automated API Maintenance System (v0.3.0)
+## Automated API Maintenance System (v0.3.0) - MAINTAINER ONLY
 
 ### Overview
-Complete zero-manual-review pipeline for handling Venice.ai API changes. Designed specifically for developers with ADHD/PTSD who cannot reliably review generated code. System prioritizes safety through automation rather than human oversight.
+Complete zero-manual-review pipeline for handling Venice.ai API changes. **This is maintainer-only infrastructure** - end users of the library don't need to interact with this system. Designed specifically for developers with ADHD/PTSD who cannot reliably review generated code. System prioritizes safety through automation rather than human oversight.
 
 ### System Architecture
 

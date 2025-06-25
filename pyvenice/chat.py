@@ -170,7 +170,9 @@ class ChatCompletionResponse(BaseModel):
     kv_transfer_params: Optional[Dict[str, Any]] = None
     completion_tokens: Optional[str] = Field(None, description="completion_tokens")
     prompt_tokens: Optional[str] = Field(None, description="prompt_tokens")
-    prompt_tokens_details: Optional[str] = Field(None, description="prompt_tokens_details")
+    prompt_tokens_details: Optional[str] = Field(
+        None, description="prompt_tokens_details"
+    )
     total_tokens: Optional[str] = Field(None, description="total_tokens")
     disable_thinking: Optional[Any] = Field(None, description="disable_thinking")
 
