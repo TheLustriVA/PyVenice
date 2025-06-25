@@ -9,7 +9,7 @@ import sys
 import os
 import json
 from pathlib import Path
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, Set
 import importlib.util
 
 # Add project root to path
@@ -209,7 +209,7 @@ class ModelAuditor:
             'success_rate': (successful_models / total_endpoints) * 100
         }
         
-        print(f"\n📊 Audit Summary:")
+        print("\n📊 Audit Summary:")
         print(f"   Total endpoints: {summary['total_endpoints']}")
         print(f"   Successful models: {summary['successful_models']}")
         print(f"   Failed models: {summary['failed_models']}")

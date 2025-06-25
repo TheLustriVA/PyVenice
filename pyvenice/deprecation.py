@@ -98,13 +98,6 @@ def deprecated_parameter(schema: str, parameter: str, removed_version: str = Non
         def wrapper(*args, **kwargs):
             # Check for deprecated parameter
             if parameter in kwargs:
-                info = {
-                    'removed_version': removed_version,
-                    'replacement': replacement,
-                    'removal_date': removal_date,
-                    'behavior': behavior
-                }
-                
                 message = f"Parameter '{parameter}' is deprecated"
                 if removed_version:
                     message += f" (removed in API version {removed_version})"

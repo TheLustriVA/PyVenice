@@ -11,9 +11,8 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Set, Tuple
+from typing import Dict, Any, Set
 import hashlib
-import difflib
 
 import httpx
 import yaml
@@ -66,7 +65,7 @@ class APIMonitor:
                 # Convert to string via YAML to handle datetime objects
                 schema_str = yaml.dump(schema, sort_keys=True)
                 schema_hashes[name] = hashlib.md5(schema_str.encode()).hexdigest()
-            except Exception as e:
+            except Exception:
                 # Fallback to string representation
                 schema_hashes[name] = hashlib.md5(str(schema).encode()).hexdigest()
         return schema_hashes
@@ -353,7 +352,7 @@ async def run_changelog_monitoring():
                 print(f"   ⚠️  API-relevant changes: {changelog_report['api_relevant_new']}")
                 return changelog_report['api_relevant_entries']
             else:
-                print(f"   ✅ No new API-relevant changes")
+                print("   ✅ No new API-relevant changes")
         else:
             print(f"   ❌ Changelog monitoring failed: {changelog_report.get('error', 'Unknown error')}")
     except Exception as e:

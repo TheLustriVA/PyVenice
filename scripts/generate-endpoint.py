@@ -9,7 +9,6 @@ the existing patterns in the pyvenice library.
 
 import asyncio
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, Any, List
@@ -328,7 +327,7 @@ Generate the complete implementation for this new endpoint."""
             
             # Use claude-code CLI (if available) or provide instructions
             cmd = f"claude-code '{prompt}'"
-            print(f"💡 Run this command to update the code:")
+            print("💡 Run this command to update the code:")
             print(f"   {cmd}")
             print()
             print("Alternatively, copy the prompt from the file above and paste it into Claude Code.")
@@ -429,11 +428,11 @@ Generate the complete implementation for this new endpoint."""
                 print(f"  {i}. {title}")
                 print(f"     📝 Prompt: {prompt_file}")
             
-            print(f"\n💡 Execute these tasks in order:")
+            print("\n💡 Execute these tasks in order:")
             for i in range(len(prompts)):
                 print(f"   claude-code \"$(cat /tmp/claude_prompt_{i+1}.md)\"")
             
-            print(f"\n🎯 Or run all at once by feeding each prompt file to Claude Code sequentially.")
+            print("\n🎯 Or run all at once by feeding each prompt file to Claude Code sequentially.")
             return True
         else:
             print("✨ No changes requiring code updates")

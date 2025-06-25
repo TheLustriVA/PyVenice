@@ -7,7 +7,6 @@ that can be safely removed after API deprecations.
 """
 
 import ast
-import sys
 from pathlib import Path
 from typing import Dict, Set, List, Any
 import json
@@ -269,7 +268,7 @@ class DeadCodeDetector:
         
         analysis = self.analyze_codebase()
         
-        print(f"📊 Analysis complete:")
+        print("📊 Analysis complete:")
         print(f"  Files analyzed: {analysis['stats']['total_files']}")
         print(f"  Definitions found: {analysis['stats']['total_definitions']}")
         print(f"  Dead items detected: {analysis['stats']['dead_items']}")

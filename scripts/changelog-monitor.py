@@ -8,7 +8,7 @@ Integrates with existing automation system to provide proactive change detection
 
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import re
@@ -62,7 +62,7 @@ class VeniceChangelogMonitor:
                             timeout=30000
                         )
                         print("✅ Cloudflare challenge completed")
-                    except:
+                    except Exception:
                         print("⚠️  Cloudflare challenge timeout, trying anyway...")
                 
                 # Check final status
@@ -103,7 +103,7 @@ class VeniceChangelogMonitor:
                         if login_element:
                             print(f"   Found login element: {selector}")
                             break
-                    except:
+                    except Exception:
                         continue
                 
                 if not login_element:
@@ -354,7 +354,7 @@ async def main():
     monitor = VeniceChangelogMonitor()
     report = await monitor.monitor_changelog()
     
-    print(f"\n📊 Changelog Monitoring Summary:")
+    print("\n📊 Changelog Monitoring Summary:")
     print(f"   Status: {report.get('status', 'unknown')}")
     
     if report.get('status') == 'success':
@@ -363,7 +363,7 @@ async def main():
         print(f"   API-relevant new: {report['api_relevant_new']}")
         
         if report['api_relevant_new'] > 0:
-            print(f"\n⚠️  API-relevant changes detected!")
+            print("\n⚠️  API-relevant changes detected!")
             alerts = monitor.generate_api_change_alerts(report)
             
             # Save alerts

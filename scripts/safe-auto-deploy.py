@@ -11,8 +11,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
-import tempfile
+from typing import Dict, Any, Optional, Tuple
 import shutil
 from datetime import datetime
 

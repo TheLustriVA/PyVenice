@@ -6,20 +6,18 @@ Automatically updates PyVenice Pydantic models based on detected API schema chan
 Integrates with model audit and response schema monitoring systems.
 """
 
-import os
 import sys
 import json
 import ast
 import re
 from pathlib import Path
-from typing import Dict, List, Any, Set, Optional
+from typing import Dict, List, Any, Optional
 from datetime import datetime
 import tempfile
 import shutil
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pyvenice.client import VeniceClient
 
 
 class ModelUpdater:
@@ -343,7 +341,7 @@ echo "Restore completed."
         # Validate updates
         if updates_made > 0:
             if not self.validate_updated_models():
-                print(f"❌ Model validation failed, restoring backup...")
+                print("❌ Model validation failed, restoring backup...")
                 self.restore_backup()
                 return {'status': 'failed', 'error': 'Model validation failed', 'backup_path': str(self.backup_dir)}
         

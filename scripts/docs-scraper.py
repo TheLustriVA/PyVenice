@@ -11,7 +11,6 @@ import json
 import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup
@@ -290,7 +289,7 @@ class VeniceDocsScraper:
             'scraped_data_path': str(scraped_path)
         }
         
-        print(f"\n📊 Scraping Summary:")
+        print("\n📊 Scraping Summary:")
         print(f"  Endpoints: {summary['endpoints_scraped']}")
         print(f"  Parameters: {summary['total_parameters']}")
         print(f"  Examples: {summary['total_examples']}")

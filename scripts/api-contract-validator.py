@@ -11,7 +11,6 @@ import os
 import sys
 import json
 from pathlib import Path
-from typing import Dict, Any, List
 import warnings
 
 # Add the pyvenice directory to the path for testing
@@ -20,7 +19,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from pyvenice import VeniceClient, ChatCompletion
     from pyvenice.deprecation import deprecation_manager
-    from pyvenice.exceptions import InvalidRequestError
 except ImportError as e:
     print(f"❌ Cannot import pyvenice: {e}")
     print("Make sure to run from the project root and install dependencies")
@@ -64,7 +62,7 @@ class APIContractValidator:
                 warnings.simplefilter("always")
                 
                 # Test deprecated parameter detection
-                deprecated_params = deprecation_manager.filter_deprecated_params(
+                deprecation_manager.filter_deprecated_params(
                     'ChatCompletionRequest',
                     {
                         'model': 'venice-uncensored',
@@ -158,7 +156,7 @@ class APIContractValidator:
                 warnings.simplefilter("always")
                 
                 # This should trigger capability validation
-                response = chat.create(
+                chat.create(
                     model="venice-uncensored",
                     messages=[{"role": "user", "content": "test"}],
                     parallel_tool_calls=True,  # Might not be supported
@@ -188,7 +186,7 @@ class APIContractValidator:
             chat = ChatCompletion(self.client)
             
             # Test with newer parameters that should be supported
-            response = chat.create(
+            chat.create(
                 model="venice-uncensored",
                 messages=[{"role": "user", "content": "test"}],
                 top_logprobs=1,  # Newer parameter
@@ -218,7 +216,7 @@ class APIContractValidator:
             chat = ChatCompletion(self.client)
             
             # Test old-style API call
-            response = chat.create(
+            chat.create(
                 model="venice-uncensored",
                 messages=[{"role": "user", "content": "Hello"}],
                 temperature=0.7,
@@ -295,7 +293,7 @@ class APIContractValidator:
             print(f"\n⚠️  VALIDATION PASSED WITH WARNINGS: {status_counts['WARN']} warning(s)")
             return True
         else:
-            print(f"\n✅ ALL TESTS PASSED")
+            print("\n✅ ALL TESTS PASSED")
             return True
 
 

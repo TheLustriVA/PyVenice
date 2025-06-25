@@ -362,10 +362,10 @@ except Exception as e:
             print(f"  {emoji} {status}: {count}")
         
         if all_passed and status_counts.get('FAIL', 0) == 0:
-            print(f"\n✅ ALL VALIDATIONS PASSED - Changes are safe to deploy")
+            print("\n✅ ALL VALIDATIONS PASSED - Changes are safe to deploy")
             return True, backup_dir
         else:
-            print(f"\n❌ VALIDATION FAILED - Changes are NOT safe")
+            print("\n❌ VALIDATION FAILED - Changes are NOT safe")
             if backup_dir:
                 print(f"💾 Backup available for restore: {backup_dir}")
             return False, backup_dir
@@ -395,9 +395,9 @@ async def main():
     success, backup_dir = await validator.comprehensive_validation(changes)
     
     if success:
-        print(f"\n🎉 Validation complete - system is stable")
+        print("\n🎉 Validation complete - system is stable")
     else:
-        print(f"\n🚨 Validation failed - manual intervention required")
+        print("\n🚨 Validation failed - manual intervention required")
         if backup_dir:
             print(f"   Restore command: python scripts/safety-validator.py --restore {backup_dir}")
     

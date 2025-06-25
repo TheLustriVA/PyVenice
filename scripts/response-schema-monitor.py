@@ -10,7 +10,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List
 from datetime import datetime
 import hashlib
 
@@ -228,12 +228,12 @@ if __name__ == "__main__":
     monitor = ResponseSchemaMonitor()
     report = monitor.monitor_schemas()
     
-    print(f"\n📊 Schema Monitoring Summary:")
+    print("\n📊 Schema Monitoring Summary:")
     print(f"   Monitored endpoints: {report['monitored_endpoints']}")
     print(f"   Endpoints with changes: {report['endpoints_with_changes']}")
     
     if report['schema_changes']:
-        print(f"\n⚠️  Schema changes detected! Generating update tasks...")
+        print("\n⚠️  Schema changes detected! Generating update tasks...")
         tasks = monitor.generate_model_update_tasks(report['schema_changes'])
         
         # Save tasks to file
@@ -246,7 +246,7 @@ if __name__ == "__main__":
         
         print(f"   Tasks saved to: {tasks_file}")
     else:
-        print(f"✅ No schema changes detected")
+        print("✅ No schema changes detected")
     
     # Save monitoring report
     report_file = monitor.docs_dir / "schema_monitoring_report.json"
