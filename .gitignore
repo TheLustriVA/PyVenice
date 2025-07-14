@@ -85,3 +85,7 @@ local_*.sh
 
 # Calibration and estimation documents (private)
 estimates/
+
+GRIMOIRE.md
+PROCEDURES.md
+CLAUDE.md
