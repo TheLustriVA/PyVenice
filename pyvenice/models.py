@@ -82,6 +82,7 @@ class Model(BaseModel):
     model_spec: ModelSpec = Field(description="Model specifications")
     object: Literal["model"] = Field("model", description="Object type")
     owned_by: str = Field(description="Model owner")
+    type: Optional[str] = Field(None, description="Model type")
 
 
 class ModelListResponse(BaseModel):

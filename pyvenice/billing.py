@@ -34,7 +34,7 @@ class UsageEntry(BaseModel):
     pricePerUnitUsd: float = Field(description="Price per unit in USD")
     units: float = Field(description="Number of units")
     amount: float = Field(description="Total amount charged")
-    currency: Literal["USD", "VCU"] = Field(description="Currency type")
+    currency: Literal["USD", "VCU", "DIEM"] = Field(description="Currency type")
     notes: str = Field(description="Usage notes")
     inferenceDetails: Optional[InferenceDetails] = None
 
@@ -61,7 +61,7 @@ class Billing(BaseResource):
         *,
         start_date: Optional[Union[datetime, str]] = None,
         end_date: Optional[Union[datetime, str]] = None,
-        currency: Optional[Literal["USD", "VCU"]] = None,
+        currency: Optional[Literal["USD", "VCU", "DIEM"]] = None,
         page: int = 1,
         limit: int = 200,
         sort_order: Literal["asc", "desc"] = "desc",
@@ -140,7 +140,7 @@ class Billing(BaseResource):
         *,
         start_date: Optional[Union[datetime, str]] = None,
         end_date: Optional[Union[datetime, str]] = None,
-        currency: Optional[Literal["USD", "VCU"]] = None,
+        currency: Optional[Literal["USD", "VCU", "DIEM"]] = None,
         page: int = 1,
         limit: int = 200,
         sort_order: Literal["asc", "desc"] = "desc",
@@ -205,7 +205,7 @@ class Billing(BaseResource):
         *,
         start_date: Optional[Union[datetime, str]] = None,
         end_date: Optional[Union[datetime, str]] = None,
-        currency: Optional[Literal["USD", "VCU"]] = None,
+        currency: Optional[Literal["USD", "VCU", "DIEM"]] = None,
         sort_order: Literal["asc", "desc"] = "desc",
     ) -> List[UsageEntry]:
         """
@@ -267,8 +267,8 @@ class Billing(BaseResource):
         summary = {
             "total_usd": 0.0,
             "total_vcu": 0.0,
-            "by_model": {},
-            "by_service": {},
+            "total_diem": 0.0,
+            "by_sku": {},
             "entry_count": len(all_usage),
         }
 
@@ -276,34 +276,26 @@ class Billing(BaseResource):
             # Update totals
             if entry.currency == "USD":
                 summary["total_usd"] += entry.amount
-            else:
+            elif entry.currency == "VCU":
                 summary["total_vcu"] += entry.amount
+            else:  # DIEM
+                summary["total_diem"] += entry.amount
 
-            # Update by model
-            model_id = entry.modelId or "unknown"
-            if model_id not in summary["by_model"]:
-                summary["by_model"][model_id] = {
+            # Update by SKU (closest thing to model/service identifier)
+            sku = entry.sku
+            if sku not in summary["by_sku"]:
+                summary["by_sku"][sku] = {
                     "usd": 0.0,
                     "vcu": 0.0,
+                    "diem": 0.0,
                     "count": 0,
                 }
-            summary["by_model"][model_id]["count"] += 1
+            summary["by_sku"][sku]["count"] += 1
             if entry.currency == "USD":
-                summary["by_model"][model_id]["usd"] += entry.amount
-            else:
-                summary["by_model"][model_id]["vcu"] += entry.amount
-
-            # Update by service
-            if entry.service not in summary["by_service"]:
-                summary["by_service"][entry.service] = {
-                    "usd": 0.0,
-                    "vcu": 0.0,
-                    "count": 0,
-                }
-            summary["by_service"][entry.service]["count"] += 1
-            if entry.currency == "USD":
-                summary["by_service"][entry.service]["usd"] += entry.amount
-            else:
-                summary["by_service"][entry.service]["vcu"] += entry.amount
+                summary["by_sku"][sku]["usd"] += entry.amount
+            elif entry.currency == "VCU":
+                summary["by_sku"][sku]["vcu"] += entry.amount
+            else:  # DIEM
+                summary["by_sku"][sku]["diem"] += entry.amount
 
         return summary

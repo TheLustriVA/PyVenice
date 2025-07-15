@@ -95,6 +95,13 @@ class UpscaleImageRequest(BaseModel):
         return self
 
 
+class EditImageRequest(BaseModel):
+    """Request model for image editing."""
+    
+    prompt: str = Field(..., min_length=1, max_length=1500, description="Text directions to edit or modify the image")
+    image: Union[str, bytes]  # Base64 string, binary data, or URL
+
+
 class ImageGenerationResponse(BaseModel):
     """Response from image generation endpoints."""
 
@@ -129,6 +136,7 @@ class ImageGeneration(BaseResource):
     - Image generation (Venice and OpenAI compatible)
     - Style presets listing
     - Image upscaling and enhancement
+    - Image editing based on text prompts
     """
 
     def __init__(self, client: VeniceClient):
@@ -350,6 +358,103 @@ class ImageGeneration(BaseResource):
         response = await self.client._request_async(
             "POST",
             "/image/upscale",
+            data=request.model_dump(exclude_none=True),
+            headers=headers,
+            stream=True,
+        )
+
+        return response.content
+
+    def edit(
+        self,
+        prompt: str,
+        image: Union[str, bytes, Path, BinaryIO],
+    ) -> bytes:
+        """
+        Edit or modify an image based on a text prompt.
+        
+        Args:
+            prompt: Text description of desired edits (max 1500 chars).
+            image: Image to edit (base64, bytes, file path, or file object).
+            
+        Returns:
+            Edited image as bytes.
+            
+        Example:
+            >>> # Edit from file
+            >>> edited_image = image_gen.edit(
+            ...     "Change the sky to a sunset",
+            ...     "input.jpg"
+            ... )
+            >>> with open("edited.png", "wb") as f:
+            ...     f.write(edited_image)
+        """
+        # Convert image to base64 if needed
+        if isinstance(image, Path):
+            with open(image, "rb") as f:
+                image = base64.b64encode(f.read()).decode()
+        elif isinstance(image, BinaryIO):
+            image = base64.b64encode(image.read()).decode()
+        elif isinstance(image, bytes):
+            image = base64.b64encode(image).decode()
+        elif isinstance(image, str) and not image.startswith(("http://", "https://", "data:")):
+            # Assume it's a file path if it's a string but not a URL or base64 data URI
+            try:
+                with open(image, "rb") as f:
+                    image = base64.b64encode(f.read()).decode()
+            except (FileNotFoundError, OSError):
+                # If it's not a valid file path, assume it's already base64
+                pass
+
+        request = EditImageRequest(
+            prompt=prompt,
+            image=image,
+        )
+
+        # This endpoint returns binary data
+        headers = {"Accept": "image/png"}
+        response = self.client._request(
+            "POST",
+            "/image/edit",
+            data=request.model_dump(exclude_none=True),
+            headers=headers,
+            stream=True,
+        )
+
+        return response.content
+
+    async def edit_async(
+        self,
+        prompt: str,
+        image: Union[str, bytes, Path, BinaryIO],
+    ) -> bytes:
+        """Async version of edit()."""
+        # Convert image to base64 if needed
+        if isinstance(image, Path):
+            with open(image, "rb") as f:
+                image = base64.b64encode(f.read()).decode()
+        elif isinstance(image, BinaryIO):
+            image = base64.b64encode(image.read()).decode()
+        elif isinstance(image, bytes):
+            image = base64.b64encode(image).decode()
+        elif isinstance(image, str) and not image.startswith(("http://", "https://", "data:")):
+            # Assume it's a file path if it's a string but not a URL or base64 data URI
+            try:
+                with open(image, "rb") as f:
+                    image = base64.b64encode(f.read()).decode()
+            except (FileNotFoundError, OSError):
+                # If it's not a valid file path, assume it's already base64
+                pass
+
+        request = EditImageRequest(
+            prompt=prompt,
+            image=image,
+        )
+
+        headers = {"Accept": "image/png"}
+        response = await self.client._request_async(
+            "POST",
+            "/image/edit",
             data=request.model_dump(exclude_none=True),
             headers=headers,
             stream=True,

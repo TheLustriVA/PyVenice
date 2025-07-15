@@ -44,5 +44,227 @@
       "modified": []
     },
     "summary": "No changes detected (version: 20250612.151220 \u2192 20250612.151220)"
+  },
+  {
+    "timestamp": "2025-07-15T04:47:07.976282",
+    "version_change": {
+      "old": "20250612.151220",
+      "new": "20250713.224148"
+    },
+    "endpoints": {
+      "added": [
+        "POST /image/edit"
+      ],
+      "removed": [],
+      "modified": []
+    },
+    "schemas": {
+      "added": [
+        "DetailedError",
+        "EditImageRequest",
+        "StandardError"
+      ],
+      "removed": [],
+      "modified": [
+        "BillingUsageRequest",
+        "BillingUsageResponse",
+        "ChatCompletionRequest",
+        "GenerateImageRequest",
+        "ModelResponse"
+      ]
+    },
+    "parameters": {
+      "added": [
+        {
+          "schema": "EditImageRequest",
+          "parameter": "prompt",
+          "definition": {
+            "type": "string",
+            "required": true,
+            "description": "The text directions to edit or modify the image. Does best with short but descriptive prompts. IE: \"Change the color of\", \"remove the object\", \"change the sky to a sunrise\", etc.",
+            "hash": "c3d11e518aac6c9f30c436b79959f153"
+          }
+        },
+        {
+          "schema": "EditImageRequest",
+          "parameter": "image",
+          "definition": {
+            "type": "unknown",
+            "required": true,
+            "description": "The image to edit. Can be either a file upload, a base64-encoded string, or a URL starting with http:// or https://. Image dimensions must be at least 65536 pixels and must not exceed 33177600 pixels. Image URLs must be less than 5MB.",
+            "hash": "a7e34ae038f0234a4d3f45adb664177c"
+          }
+        },
+        {
+          "schema": "DetailedError",
+          "parameter": "details",
+          "definition": {
+            "type": "object",
+            "required": false,
+            "description": "Details about the incorrect input",
+            "hash": "f510918dcad786a09558d4d607738b78"
+          }
+        },
+        {
+          "schema": "DetailedError",
+          "parameter": "error",
+          "definition": {
+            "type": "string",
+            "required": true,
+            "description": "A description of the error",
+            "hash": "e781f93c6f64a82fa0fb6aa0431f727d"
+          }
+        },
+        {
+          "schema": "StandardError",
+          "parameter": "error",
+          "definition": {
+            "type": "string",
+            "required": true,
+            "description": "A description of the error",
+            "hash": "e781f93c6f64a82fa0fb6aa0431f727d"
+          }
+        }
+      ],
+      "removed": [],
+      "modified": [
+        {
+          "schema": "ChatCompletionRequest",
+          "parameter": "top_p",
+          "old_definition": {
+            "type": "number",
+            "required": false,
+            "description": "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+            "hash": "b2cfe8221d1170a9501baa3194124e21"
+          },
+          "new_definition": {
+            "type": "number",
+            "required": false,
+            "description": "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+            "hash": "1446407c5bd7ea75354afd3ce56b8c34"
+          }
+        },
+        {
+          "schema": "ChatCompletionRequest",
+          "parameter": "temperature",
+          "old_definition": {
+            "type": "number",
+            "required": false,
+            "description": "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both.",
+            "hash": "6ba11073cc2f6ccebf3dc4fa02ae0dde"
+          },
+          "new_definition": {
+            "type": "number",
+            "required": false,
+            "description": "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both.",
+            "hash": "a6b21db4d41d881f801483668222bcdc"
+          }
+        },
+        {
+          "schema": "ModelResponse",
+          "parameter": "type",
+          "old_definition": {
+            "type": "string",
+            "required": true,
+            "description": "Model type",
+            "hash": "45f0f582d8cbf88156f5f8044f68de91"
+          },
+          "new_definition": {
+            "type": "string",
+            "required": true,
+            "description": "Model type",
+            "hash": "9e952b9ae302d55f590c4ae4bb49e236"
+          }
+        },
+        {
+          "schema": "ModelResponse",
+          "parameter": "model_spec",
+          "old_definition": {
+            "type": "object",
+            "required": true,
+            "description": "",
+            "hash": "ebd2082f6ce762d601d861542d34604d"
+          },
+          "new_definition": {
+            "type": "object",
+            "required": true,
+            "description": "",
+            "hash": "295e54c970816f5877f45664414644fb"
+          }
+        },
+        {
+          "schema": "GenerateImageRequest",
+          "parameter": "steps",
+          "old_definition": {
+            "type": "integer",
+            "required": false,
+            "description": "Number of inference steps. The following models have reduced max steps from the global max: venice-sd35: 30 max steps, hidream: 50 max steps, fluently-xl: 50 max steps, flux-dev: 30 max steps, flux-dev-uncensored: 30 max steps, getphat-flux: 50 max steps, lustify-sdxl: 50 max steps, pony-realism: 50 max steps, stable-diffusion-3.5: 30 max steps, juggernaut-xi: 50 max steps. These constraints are exposed in the model list endpoint for each model.",
+            "hash": "1bd4aba9cfacd1957c29209fc805dec0"
+          },
+          "new_definition": {
+            "type": "integer",
+            "required": false,
+            "description": "Number of inference steps. The following models have reduced max steps from the global max: venice-sd35: 30 max steps, hidream: 50 max steps, fluently-xl: 50 max steps, flux-dev: 30 max steps, flux-dev-uncensored: 30 max steps, lustify-sdxl: 50 max steps, pony-realism: 50 max steps, stable-diffusion-3.5: 30 max steps. These constraints are exposed in the model list endpoint for each model.",
+            "hash": "925cb272d6941168634c1ddd5f3ab842"
+          }
+        },
+        {
+          "schema": "BillingUsageRequest",
+          "parameter": "currency",
+          "old_definition": {
+            "type": "string",
+            "required": false,
+            "description": "Filter by currency",
+            "hash": "a83d587898f6cc1cf2ff9f8752a3a48c"
+          },
+          "new_definition": {
+            "type": "string",
+            "required": false,
+            "description": "Filter by currency",
+            "hash": "5d35ef8ac8e7e47b25148a319ea3c55a"
+          }
+        },
+        {
+          "schema": "BillingUsageResponse",
+          "parameter": "data",
+          "old_definition": {
+            "type": "array",
+            "required": true,
+            "description": "",
+            "hash": "72a9b0a7ab4af64fc682e74ef057dd1e"
+          },
+          "new_definition": {
+            "type": "array",
+            "required": true,
+            "description": "",
+            "hash": "aa0a8d4409af94cc1fbfec4afcd5adf5"
+          }
+        }
+      ]
+    },
+    "summary": "API changes detected: 1 new endpoints, 3 new schemas, 5 modified schemas, 5 new parameters, 7 modified parameters"
+  },
+  {
+    "timestamp": "2025-07-15T18:03:28.925157",
+    "version_change": {
+      "old": "20250713.224148",
+      "new": "20250713.224148"
+    },
+    "endpoints": {
+      "added": [],
+      "removed": [],
+      "modified": []
+    },
+    "schemas": {
+      "added": [],
+      "removed": [],
+      "modified": []
+    },
+    "parameters": {
+      "added": [],
+      "removed": [],
+      "modified": []
+    },
+    "summary": "No changes detected (version: 20250713.224148 \u2192 20250713.224148)"
   }
 ]

@@ -55,6 +55,11 @@ class Embeddings(BaseResource):
 
     Creates embeddings for text inputs using embedding models.
     This is a beta feature accessible to Venice beta testers.
+    
+    NOTE: The embeddings endpoint is only available to users in the Venice.ai beta program.
+    Integration tests for embeddings functionality may fail if the API key does not have
+    beta access. The dimensions parameter behavior may need validation once beta access
+    is available for testing.
     """
 
     def __init__(self, client: VeniceClient):

@@ -2,7 +2,7 @@
 API keys management endpoints for Venice.ai API.
 """
 
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -44,6 +44,40 @@ class Web3KeyResponse(BaseModel):
     key: str
     address: str
     message: str
+
+
+class CreateApiKeyRequest(BaseModel):
+    """Request model for creating API keys."""
+    
+    apiKeyType: Literal["INFERENCE", "ADMIN"] = Field(
+        ..., description="The API Key type"
+    )
+    description: str = Field(..., description="The API Key description")
+    consumptionLimit: Dict[str, Optional[float]] = Field(
+        ..., description="The API Key consumption limits"
+    )
+    expiresAt: Optional[str] = Field(
+        None, description="The API Key expiration date"
+    )
+
+
+class CreateApiKeyResponse(BaseModel):
+    """Response model for creating API keys."""
+    
+    data: Dict[str, Any] = Field(..., description="API key data")
+    
+
+class DeleteApiKeyResponse(BaseModel):
+    """Response model for deleting API keys."""
+    
+    success: bool = Field(..., description="Success status")
+
+
+class Web3TokenResponse(BaseModel):
+    """Response model for Web3 token."""
+    
+    data: Dict[str, Any] = Field(..., description="Web3 token data")
+    success: bool = Field(..., description="Success status")
 
 
 class APIKeys(BaseResource):
@@ -175,3 +209,145 @@ class APIKeys(BaseResource):
 
         response = await self.client.post_async("/api_keys/generate_web3_key", payload)
         return Web3KeyResponse(**response)
+
+    def create_key(
+        self,
+        *,
+        key_type: Literal["INFERENCE", "ADMIN"],
+        description: str,
+        usd_limit: Optional[float] = None,
+        vcu_limit: Optional[float] = None,
+        diem_limit: Optional[float] = None,
+        expires_at: Optional[str] = None
+    ) -> CreateApiKeyResponse:
+        """
+        Create a new API key.
+        
+        Args:
+            key_type: The API key type (INFERENCE or ADMIN)
+            description: Description for the API key
+            usd_limit: USD consumption limit (optional)
+            vcu_limit: VCU consumption limit (optional)
+            diem_limit: Diem consumption limit (optional)
+            expires_at: Expiration date (optional)
+            
+        Returns:
+            CreateApiKeyResponse with the new API key data
+            
+        Raises:
+            VeniceAPIError: If the API request fails
+        """
+        
+        # Build consumption limits
+        consumption_limits = {}
+        if usd_limit is not None:
+            consumption_limits["usd"] = usd_limit
+        if vcu_limit is not None:
+            consumption_limits["vcu"] = vcu_limit
+        if diem_limit is not None:
+            consumption_limits["diem"] = diem_limit
+        
+        # Create request
+        request = CreateApiKeyRequest(
+            apiKeyType=key_type,
+            description=description,
+            consumptionLimit=consumption_limits,
+            expiresAt=expires_at
+        )
+        
+        # Make API call
+        response = self.client.post(
+            "/api_keys",
+            request.model_dump(exclude_none=True)
+        )
+        
+        return CreateApiKeyResponse.model_validate(response)
+
+    async def create_key_async(
+        self,
+        *,
+        key_type: Literal["INFERENCE", "ADMIN"],
+        description: str,
+        usd_limit: Optional[float] = None,
+        vcu_limit: Optional[float] = None,
+        diem_limit: Optional[float] = None,
+        expires_at: Optional[str] = None
+    ) -> CreateApiKeyResponse:
+        """Async version of create_key()."""
+        
+        # Build consumption limits
+        consumption_limits = {}
+        if usd_limit is not None:
+            consumption_limits["usd"] = usd_limit
+        if vcu_limit is not None:
+            consumption_limits["vcu"] = vcu_limit
+        if diem_limit is not None:
+            consumption_limits["diem"] = diem_limit
+        
+        request = CreateApiKeyRequest(
+            apiKeyType=key_type,
+            description=description,
+            consumptionLimit=consumption_limits,
+            expiresAt=expires_at
+        )
+        
+        response = await self.client.post_async(
+            "/api_keys",
+            request.model_dump(exclude_none=True)
+        )
+        
+        return CreateApiKeyResponse.model_validate(response)
+
+    def delete_key(self, key_id: str) -> DeleteApiKeyResponse:
+        """
+        Delete an API key.
+        
+        Args:
+            key_id: The ID of the API key to delete
+            
+        Returns:
+            DeleteApiKeyResponse with deletion result
+            
+        Raises:
+            VeniceAPIError: If the API request fails
+        """
+        
+        # Make API call with query parameter
+        response = self.client._request(
+            "DELETE",
+            "/api_keys",
+            params={"id": key_id}
+        )
+        
+        return DeleteApiKeyResponse.model_validate(response)
+
+    async def delete_key_async(self, key_id: str) -> DeleteApiKeyResponse:
+        """Async version of delete_key()."""
+        
+        response = await self.client._request_async(
+            "DELETE",
+            "/api_keys",
+            params={"id": key_id}
+        )
+        
+        return DeleteApiKeyResponse.model_validate(response)
+
+    def get_web3_token(self) -> Web3TokenResponse:
+        """
+        Get the token required to generate an API key via a wallet.
+        
+        Returns:
+            Web3TokenResponse with the token data
+            
+        Raises:
+            VeniceAPIError: If the API request fails
+        """
+        
+        response = self.client.get("/api_keys/generate_web3_key")
+        return Web3TokenResponse.model_validate(response)
+
+    async def get_web3_token_async(self) -> Web3TokenResponse:
+        """Async version of get_web3_token()."""
+        
+        response = await self.client.get_async("/api_keys/generate_web3_key")
+        return Web3TokenResponse.model_validate(response)

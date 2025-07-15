@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/websinthe/code/pyvenice/logs/.7829e3dec341d98d7b44d18a0d9ab37d745e187b-audit.json",
+    "files": [
+        {
+            "date": 1752513599664,
+            "name": "/home/websinthe/code/pyvenice/logs/mcp-puppeteer-2025-07-15.log",
+            "hash": "8885d7636bcdde2d3bb30e01d37de00db95e267471c72e11640eb096268a8ed7"
+        }
+    ],
+    "hashType": "sha256"
+}

@@ -5,7 +5,7 @@ info:
   description: The Venice.ai API.
   termsOfService: https://venice.ai/legal/tos
   title: Venice.ai API
-  version: '20250612.151220'
+  version: '20250713.224148'
 openapi: 3.0.0
 security:
 - BearerAuth: []
@@ -26,6 +26,31 @@ components:
       scheme: bearer
       type: http
   schemas:
+    StandardError:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A description of the error
+      required:
+      - error
+    DetailedError:
+      type: object
+      properties:
+        details:
+          type: object
+          properties: {}
+          description: Details about the incorrect input
+          example:
+            _errors: []
+            field:
+              _errors:
+              - Field is required
+        error:
+          type: string
+          description: A description of the error
+      required:
+      - error
     ChatCompletionRequest:
       type: object
       properties:
@@ -351,7 +376,7 @@ components:
           type: number
           minimum: 0
           maximum: 2
-          default: 0.3
+          default: 0.7
           description: What sampling temperature to use, between 0 and 2. Higher values
             like 0.8 will make the output more random, while lower values like 0.2
             will make it more focused and deterministic. We generally recommend altering
@@ -367,7 +392,7 @@ components:
           type: number
           minimum: 0
           maximum: 1
-          default: 1
+          default: 0.9
           description: An alternative to sampling with temperature, called nucleus
             sampling, where the model considers the results of the tokens with top_p
             probability mass. So 0.1 means only the tokens comprising the top 10%
@@ -632,10 +657,9 @@ components:
           description: 'Number of inference steps. The following models have reduced
             max steps from the global max: venice-sd35: 30 max steps, hidream: 50
             max steps, fluently-xl: 50 max steps, flux-dev: 30 max steps, flux-dev-uncensored:
-            30 max steps, getphat-flux: 50 max steps, lustify-sdxl: 50 max steps,
-            pony-realism: 50 max steps, stable-diffusion-3.5: 30 max steps, juggernaut-xi:
-            50 max steps. These constraints are exposed in the model list endpoint
-            for each model.'
+            30 max steps, lustify-sdxl: 50 max steps, pony-realism: 50 max steps,
+            stable-diffusion-3.5: 30 max steps. These constraints are exposed in the
+            model list endpoint for each model.'
           example: 20
         style_preset:
           type: string
@@ -844,6 +868,34 @@ components:
         enhancePrompt: gold
         image: iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAAIGNIUk0A...
         scale: 2
+    EditImageRequest:
+      type: object
+      properties:
+        prompt:
+          type: string
+          maxLength: 1500
+          description: 'The text directions to edit or modify the image. Does best
+            with short but descriptive prompts. IE: "Change the color of", "remove
+            the object", "change the sky to a sunrise", etc.'
+          example: Change the color of the sky to a sunrise
+        image:
+          anyOf:
+          - {}
+          - type: string
+          - type: string
+            format: uri
+          description: The image to edit. Can be either a file upload, a base64-encoded
+            string, or a URL starting with http:// or https://. Image dimensions must
+            be at least 65536 pixels and must not exceed 33177600 pixels. Image URLs
+            must be less than 5MB.
+      required:
+      - prompt
+      - image
+      additionalProperties: false
+      description: Edit an image based on the supplied prompt.
+      example:
+        prompt: Colorize
+        image: iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAAIGNIUk0A...
     CreateEmbeddingRequestSchema:
       type: object
       properties:
@@ -1063,6 +1115,7 @@ components:
           enum:
           - USD
           - VCU
+          - DIEM
           example: USD
         endDate:
           type: string
@@ -1113,6 +1166,7 @@ components:
                 enum:
                 - USD
                 - VCU
+                - DIEM
                 description: The currency charged for the billing usage entry
                 example: USD
               inferenceDetails:
@@ -1192,15 +1246,15 @@ components:
       example:
         data:
         - amount: -0.1
-          currency: VCU
+          currency: DIEM
           inferenceDetails: null
           notes: API Inference
-          pricePerUnitUsd: 0.01
+          pricePerUnitUsd: 0.1
           sku: venice-sd35-image-unit
           timestamp: {}
           units: 1
-        - amount: -0.006356
-          currency: VCU
+        - amount: -0.06356
+          currency: DIEM
           inferenceDetails:
             completionTokens: 227
             inferenceExecutionTime: 2964
@@ -1350,6 +1404,10 @@ components:
                 description: Constraints that apply to text models.
                 title: Text Model Constraints
               description: Constraints that apply to this model.
+            name:
+              type: string
+              description: The name of the model.
+              example: Venice Uncensored 1.1
             modelSource:
               type: string
               description: The source of the model, such as a URL to the model repository.
@@ -1372,11 +1430,18 @@ components:
                         example: 0.7
                       vcu:
                         type: number
-                        description: VCU cost per million input tokens
+                        description: VCU cost per million input tokens (deprecated
+                          - use Diem instead)
+                        deprecated: true
+                        example: 7
+                      diem:
+                        type: number
+                        description: Diem cost per million input tokens
                         example: 7
                     required:
                     - usd
                     - vcu
+                    - diem
                   output:
                     type: object
                     properties:
@@ -1386,11 +1451,18 @@ components:
                         example: 2.8
                       vcu:
                         type: number
-                        description: VCU cost per million output tokens
+                        description: VCU cost per million output tokens (deprecated
+                          - use Diem instead)
+                        deprecated: true
+                        example: 28
+                      diem:
+                        type: number
+                        description: Diem cost per million output tokens
                         example: 28
                     required:
                     - usd
                     - vcu
+                    - diem
                 required:
                 - input
                 - output
@@ -1407,11 +1479,18 @@ components:
                         example: 0.01
                       vcu:
                         type: number
-                        description: VCU cost per image generation
+                        description: VCU cost per image generation (deprecated - use
+                          Diem instead)
+                        deprecated: true
+                        example: 0.1
+                      diem:
+                        type: number
+                        description: Diem cost per image generation
                         example: 0.1
                     required:
                     - usd
                     - vcu
+                    - diem
                   upscale:
                     type: object
                     properties:
@@ -1424,11 +1503,18 @@ components:
                             example: 0.02
                           vcu:
                             type: number
-                            description: VCU cost for 2x upscale
+                            description: VCU cost for 2x upscale (deprecated - use
+                              Diem instead)
+                            deprecated: true
+                            example: 0.2
+                          diem:
+                            type: number
+                            description: Diem cost for 2x upscale
                             example: 0.2
                         required:
                         - usd
                         - vcu
+                        - diem
                       4x:
                         type: object
                         properties:
@@ -1438,11 +1524,18 @@ components:
                             example: 0.08
                           vcu:
                             type: number
-                            description: VCU cost for 4x upscale
+                            description: VCU cost for 4x upscale (deprecated - use
+                              Diem instead)
+                            deprecated: true
+                            example: 0.8
+                          diem:
+                            type: number
+                            description: Diem cost for 4x upscale
                             example: 0.8
                         required:
                         - usd
                         - vcu
+                        - diem
                     required:
                     - 2x
                     - 4x
@@ -1462,11 +1555,18 @@ components:
                         example: 3.5
                       vcu:
                         type: number
-                        description: VCU cost per million input characters
+                        description: VCU cost per million input characters (deprecated
+                          - use Diem instead)
+                        deprecated: true
+                        example: 35
+                      diem:
+                        type: number
+                        description: Diem cost per million input characters
                         example: 35
                     required:
                     - usd
                     - vcu
+                    - diem
                 required:
                 - input
                 description: Pricing for audio models (TTS)
@@ -1513,6 +1613,7 @@ components:
           - text
           - tts
           - upscale
+          - inpaint
           description: Model type
           example: text
       required:
@@ -1541,15 +1642,18 @@ components:
               default: 0.8
             top_p:
               default: 0.9
+          name: Llama 3.2 3B
           modelSource: https://huggingface.co/meta-llama/Llama-3.2-3B
           offline: false
           pricing:
             input:
               usd: 0.15
               vcu: 1.5
+              diem: 0.15
             output:
               usd: 0.6
               vcu: 6
+              diem: 0.6
           traits:
           - fastest
         object: model
@@ -2004,101 +2108,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '504':
           description: The request took too long to complete and was timed-out. For
             long-running inference requests, use the streaming API by setting stream=true
@@ -2106,16 +2152,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The request took too long to complete and was timed-out.
-                      For long-running inference requests, use the streaming API by
-                      setting stream=true in your request.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /image/generate:
     post:
       description: Generate an image based on input parameters
@@ -2224,101 +2261,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /images/generations:
     post:
       description: Generate an image based on input parameters using an OpenAI compatible
@@ -2403,101 +2382,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /image/styles:
     get:
       description: List available image styles that can be used with the generate
@@ -2539,27 +2460,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /image/upscale:
     post:
       description: Upscale or enhance an image based on the supplied parameters. Using
@@ -2584,7 +2491,6 @@ paths:
           content:
             image/png:
               schema:
-                example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
                 format: binary
                 type: string
         '400':
@@ -2592,101 +2498,110 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
+  /image/edit:
+    post:
+      description: Edit or modify an image based on the supplied prompt. The image
+        can be provided either as a multipart form-data file upload or as a base64-encoded
+        string in a JSON request.
+      operationId: editImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditImageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EditImageRequest'
+      summary: /api/v1/image/edit
+      tags:
+      - Image
+      responses:
+        '200':
+          description: OK
+          content:
+            image/png:
+              schema:
+                format: binary
+                type: string
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedError'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+        '402':
+          description: Insufficient USD or Diem balance to complete request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+        '415':
+          description: Invalid request content-type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+        '500':
+          description: Inference processing failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
+        '503':
+          description: The model is at capacity. Please try again later.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardError'
   /models:
     get:
       description: Returns a list of available models supported by the Venice.ai API
@@ -2708,6 +2623,7 @@ paths:
             - text
             - tts
             - upscale
+            - inpaint
           - type: string
             enum:
             - all
@@ -2743,6 +2659,7 @@ paths:
                       - text
                       - tts
                       - upscale
+                      - inpaint
                     - type: string
                       enum:
                       - all
@@ -2758,14 +2675,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /models/traits:
     get:
       description: Returns a list of model traits and the associated model.
@@ -2785,6 +2695,7 @@ paths:
           - text
           - tts
           - upscale
+          - inpaint
           default: text
           description: Filter models by type.
           example: text
@@ -2814,6 +2725,7 @@ paths:
                       - text
                       - tts
                       - upscale
+                      - inpaint
                     - type: string
                       enum:
                       - all
@@ -2829,27 +2741,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /models/compatibility_mapping:
     get:
       description: Returns a list of model compatibility mappings and the associated
@@ -2870,6 +2768,7 @@ paths:
           - text
           - tts
           - upscale
+          - inpaint
           default: text
           description: Filter models by type.
           example: text
@@ -2899,6 +2798,7 @@ paths:
                       - text
                       - tts
                       - upscale
+                      - inpaint
                     - type: string
                       enum:
                       - all
@@ -2914,27 +2814,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /api_keys:
     get:
       description: Return a list of API keys.
@@ -2975,6 +2861,16 @@ paths:
                                 title: 'null'
                               description: USD limit
                               example: 50
+                            diem:
+                              anyOf:
+                              - type: number
+                                minimum: 0
+                              - nullable: true
+                                title: 'null'
+                              - nullable: true
+                                title: 'null'
+                              description: Diem limit
+                              example: 10
                             vcu:
                               anyOf:
                               - type: number
@@ -2983,15 +2879,13 @@ paths:
                                 title: 'null'
                               - nullable: true
                                 title: 'null'
-                              description: VCU limit
+                              description: VCU limit (deprecated - use Diem instead)
+                              deprecated: true
                               example: 100
-                          required:
-                          - usd
-                          - vcu
                           description: The API Key consumption limits for each epoch.
                           example:
                             usd: 50
-                            vcu: 100
+                            diem: 10
                         createdAt:
                           type: string
                           nullable: true
@@ -3031,11 +2925,18 @@ paths:
                                   example: '10.2424'
                                 vcu:
                                   type: string
-                                  description: VCU usage in the trailing 7 days
+                                  description: VCU usage in the trailing 7 days (deprecated
+                                    - use Diem instead)
+                                  deprecated: true
                                   example: '42.2315'
+                                diem:
+                                  type: string
+                                  description: Diem usage in the trailing 7 days
+                                  example: '4.2231'
                               required:
                               - usd
                               - vcu
+                              - diem
                           required:
                           - trailingSevenDays
                       required:
@@ -3061,27 +2962,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
     delete:
       description: Delete an API key.
       operationId: deleteApiKey
@@ -3113,49 +3000,19 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
     post:
       description: Create a new API key.
       operationId: createApiKey
@@ -3189,6 +3046,16 @@ paths:
                         title: 'null'
                       description: USD limit
                       example: 50
+                    diem:
+                      anyOf:
+                      - type: number
+                        minimum: 0
+                      - nullable: true
+                        title: 'null'
+                      - nullable: true
+                        title: 'null'
+                      description: Diem limit
+                      example: 10
                     vcu:
                       anyOf:
                       - type: number
@@ -3197,15 +3064,13 @@ paths:
                         title: 'null'
                       - nullable: true
                         title: 'null'
-                      description: VCU limit
+                      description: VCU limit (deprecated - use Diem instead)
+                      deprecated: true
                       example: 100
-                  required:
-                  - usd
-                  - vcu
                   description: The API Key consumption limits for each epoch.
                   example:
                     usd: 50
-                    vcu: 100
+                    diem: 10
                 description:
                   type: string
                   description: The API Key description
@@ -3228,7 +3093,8 @@ paths:
               additionalProperties: false
               description: The request body for creating a new API key. API key creation
                 is rate limited to 20 requests per minute and a maximum of 500 active
-                API keys per user.
+                API keys per user. VCU is being deprecated in favor of Diem. Please
+                update your API calls to use Diem instead.
       responses:
         '200':
           description: OK
@@ -3264,6 +3130,16 @@ paths:
                               title: 'null'
                             description: USD limit
                             example: 50
+                          diem:
+                            anyOf:
+                            - type: number
+                              minimum: 0
+                            - nullable: true
+                              title: 'null'
+                            - nullable: true
+                              title: 'null'
+                            description: Diem limit
+                            example: 10
                           vcu:
                             anyOf:
                             - type: number
@@ -3272,15 +3148,13 @@ paths:
                               title: 'null'
                             - nullable: true
                               title: 'null'
-                            description: VCU limit
+                            description: VCU limit (deprecated - use Diem instead)
+                            deprecated: true
                             example: 100
-                        required:
-                        - usd
-                        - vcu
                         description: The API Key consumption limits for each epoch.
                         example:
                           usd: 50
-                          vcu: 100
+                          diem: 10
                       description:
                         type: string
                         description: The API Key description
@@ -3312,62 +3186,25 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /api_keys/rate_limits:
     get:
       description: Return details about user balances and rate limits.
@@ -3400,7 +3237,7 @@ paths:
                             example: paid
                           isCharged:
                             type: boolean
-                            description: Is the API key pay per use (in VCU or USD).
+                            description: Is the API key pay per use (in Diem or USD).
                             example: true
                         required:
                         - id
@@ -3414,7 +3251,12 @@ paths:
                             example: 50.23
                           VCU:
                             type: number
-                            description: The VCU balance of the key.
+                            description: The VCU balance of the key. VCU is being
+                              deprecated in favor of Diem.
+                            example: 100.023
+                          DIEM:
+                            type: number
+                            description: The Diem balance of the key.
                             example: 100.023
                       keyExpiration:
                         type: string
@@ -3471,27 +3313,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /api_keys/rate_limits/log:
     get:
       description: Returns the last 50 rate limits that the account exceeded.
@@ -3553,27 +3381,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /api_keys/generate_web3_key:
     get:
       description: Returns the token required to generate an API key via a wallet.
@@ -3638,6 +3452,16 @@ paths:
                         title: 'null'
                       description: USD limit
                       example: 50
+                    diem:
+                      anyOf:
+                      - type: number
+                        minimum: 0
+                      - nullable: true
+                        title: 'null'
+                      - nullable: true
+                        title: 'null'
+                      description: Diem limit
+                      example: 10
                     vcu:
                       anyOf:
                       - type: number
@@ -3646,15 +3470,13 @@ paths:
                         title: 'null'
                       - nullable: true
                         title: 'null'
-                      description: VCU limit
+                      description: VCU limit (deprecated - use Diem instead)
+                      deprecated: true
                       example: 100
-                  required:
-                  - usd
-                  - vcu
                   description: The API Key consumption limits for each epoch.
                   example:
                     usd: 50
-                    vcu: 100
+                    diem: 10
                 description:
                   type: string
                   default: Web3 API Key
@@ -3725,6 +3547,16 @@ paths:
                               title: 'null'
                             description: USD limit
                             example: 50
+                          diem:
+                            anyOf:
+                            - type: number
+                              minimum: 0
+                            - nullable: true
+                              title: 'null'
+                            - nullable: true
+                              title: 'null'
+                            description: Diem limit
+                            example: 10
                           vcu:
                             anyOf:
                             - type: number
@@ -3733,15 +3565,13 @@ paths:
                               title: 'null'
                             - nullable: true
                               title: 'null'
-                            description: VCU limit
+                            description: VCU limit (deprecated - use Diem instead)
+                            deprecated: true
                             example: 100
-                        required:
-                        - usd
-                        - vcu
                         description: The API Key consumption limits for each epoch.
                         example:
                           usd: 50
-                          vcu: 100
+                          diem: 10
                       description:
                         type: string
                         description: The API Key description
@@ -3872,31 +3702,16 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: An unknown error occurred
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: An unknown error occurred
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /embeddings:
     post:
-      description: Create embeddings for the supplied input. This is a beta model
-        accessible to Venice beta testers.
+      description: Create embeddings for the supplied input.
       operationId: createEmbedding
       parameters:
       - description: Supported compression encodings (gzip, br)
@@ -3998,101 +3813,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /audio/speech:
     post:
       description: Converts text to speech using various voice models and formats.
@@ -4139,114 +3896,49 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '402':
-          description: Insufficient USD or VCU balance to complete request
+          description: Insufficient USD or Diem balance to complete request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Insufficient USD or VCU balance to complete request
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '403':
           description: Unauthorized access
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Unauthorized access
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '415':
           description: Invalid request content-type
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request content-type
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '429':
           description: Rate limit exceeded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Rate limit exceeded
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '503':
           description: The model is at capacity. Please try again later.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: The model is at capacity. Please try again later.
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
   /billing/usage:
     get:
       description: 'Get paginated billing usage data for the authenticated user. NOTE:
@@ -4265,6 +3957,7 @@ paths:
           enum:
           - USD
           - VCU
+          - DIEM
           example: USD
         required: false
         name: currency
@@ -4368,6 +4061,7 @@ paths:
                           enum:
                           - USD
                           - VCU
+                          - DIEM
                           description: The currency charged for the billing usage
                             entry
                           example: USD
@@ -4450,15 +4144,15 @@ paths:
                 example:
                   data:
                   - amount: -0.1
-                    currency: VCU
+                    currency: DIEM
                     inferenceDetails: null
                     notes: API Inference
-                    pricePerUnitUsd: 0.01
+                    pricePerUnitUsd: 0.1
                     sku: venice-sd35-image-unit
                     timestamp: {}
                     units: 1
-                  - amount: -0.006356
-                    currency: VCU
+                  - amount: -0.06356
+                    currency: DIEM
                     inferenceDetails:
                       completionTokens: 227
                       inferenceExecutionTime: 2964
@@ -4483,46 +4177,16 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  details:
-                    type: object
-                    properties: {}
-                    description: Details about the incorrect input
-                    example:
-                      _errors: []
-                      field:
-                        _errors:
-                        - Field is required
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Invalid request parameters
-                required:
-                - error
+                $ref: '#/components/schemas/DetailedError'
         '401':
           description: Authentication failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Authentication failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'
         '500':
           description: Inference processing failed
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: A description of the error
-                    example: Inference processing failed
-                required:
-                - error
+                $ref: '#/components/schemas/StandardError'

@@ -14,6 +14,8 @@ echo "🕘 $(date): Starting Venice.ai API monitoring..."
 # Run the API monitor
 if python scripts/api-monitor.py; then
     echo "✅ API monitoring completed successfully"
+echo "📊 Generating monitoring report..."
+python scripts/monitoring-report.py
     
     # Run the changelog monitor
     echo "📰 Running changelog monitoring..."

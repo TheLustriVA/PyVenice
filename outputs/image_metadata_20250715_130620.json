@@ -1,0 +1,29 @@
+{
+  "id": "generate-image-9e1fJ44s3T_b83-1Tc5b1NNZP-D1AyH6",
+  "request": {
+    "success": true,
+    "data": {
+      "cfg_scale": 7.5,
+      "embed_exif_metadata": false,
+      "format": "webp",
+      "height": 1024,
+      "hide_watermark": true,
+      "model": "hidream",
+      "prompt": "A flying sorceress wearing translucent-azure arcane robes in a desert setting",
+      "return_binary": false,
+      "safe_mode": false,
+      "seed": 29053663,
+      "steps": 20,
+      "style_preset": "Comic Book",
+      "width": 1024
+    }
+  },
+  "timing": {
+    "inferenceDuration": 6313.0,
+    "inferencePreprocessingTime": 6411.0,
+    "inferenceQueueTime": 1927.0,
+    "total": 8338.0
+  },
+  "saved_at": "2025-07-15T13:06:20.725934",
+  "format": "png"
+}
