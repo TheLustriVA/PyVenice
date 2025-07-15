@@ -95,29 +95,25 @@ def example_image_generation():
     try:
         # Use a simple base64 encoded 1x1 pixel PNG image for testing
         tiny_image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        
+
         # Example 1: Edit with base64 image
-        edited_image = image_gen.edit(
-            prompt="Make this image blue",
-            image=tiny_image
-        )
-        
+        edited_image = image_gen.edit(prompt="Make this image blue", image=tiny_image)
+
         # Save edited image
         with open("edited_image.png", "wb") as f:
             f.write(edited_image)
         print("✅ Image edited and saved as edited_image.png")
-        
+
         # Example 2: Edit from file (if the generated image exists)
         if Path("generated_image.webp").exists():
             edited_from_file = image_gen.edit(
-                prompt="Add autumn colors",
-                image="generated_image.webp"
+                prompt="Add autumn colors", image="generated_image.webp"
             )
-            
+
             with open("edited_from_file.png", "wb") as f:
                 f.write(edited_from_file)
             print("✅ File-based image edited and saved as edited_from_file.png")
-            
+
     except Exception as e:
         print(f"❌ Image editing error: {e}")
 
@@ -168,9 +164,9 @@ def example_streaming():
 def example_api_key_management():
     """Example of API key management operations."""
     api_keys = APIKeys(client)
-    
+
     print("\n=== API Key Management ===")
-    
+
     try:
         # Get current API key info
         print("Current API key info:")
@@ -180,15 +176,17 @@ def example_api_key_management():
                 print(f"  - Type: {key.get('apiKeyType', 'N/A')}")
                 print(f"    Description: {key.get('description', 'N/A')}")
                 print(f"    ID: {key.get('id', 'N/A')[:20]}...")
-        
+
         # Get rate limits
         print("\nRate limits:")
         limits = api_keys.get_rate_limits()
         if limits.get("data"):
             for endpoint, limit in limits["data"].items():
                 if isinstance(limit, dict):
-                    print(f"  - {endpoint}: {limit.get('remaining', 'N/A')}/{limit.get('limit', 'N/A')} remaining")
-        
+                    print(
+                        f"  - {endpoint}: {limit.get('remaining', 'N/A')}/{limit.get('limit', 'N/A')} remaining"
+                    )
+
         # Get Web3 token (for wallet authentication)
         print("\nWeb3 token availability:")
         try:
@@ -199,9 +197,11 @@ def example_api_key_management():
                 print("  ❌ Web3 token not available")
         except Exception as e:
             print(f"  ❌ Web3 token error: {e}")
-        
+
         # Note: We skip create_key and delete_key in examples to avoid creating real keys
-        print("\nNote: Key creation/deletion examples skipped (requires ADMIN privileges)")
+        print(
+            "\nNote: Key creation/deletion examples skipped (requires ADMIN privileges)"
+        )
         print("To test key management:")
         print("  result = api_keys.create_key(")
         print("      key_type='INFERENCE',")
@@ -209,7 +209,7 @@ def example_api_key_management():
         print("      usd_limit=10.0")
         print("  )")
         print("  api_keys.delete_key(result.data['id'])")
-        
+
     except Exception as e:
         print(f"API key management error: {e}")
 
