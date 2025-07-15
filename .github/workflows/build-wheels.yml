@@ -71,4 +71,16 @@ jobs:
         path: dist
         merge-multiple: true
     
+    - name: Setup PyPI trusted publisher
+      run: |
+        echo "📋 PyPI Trusted Publisher Configuration Required"
+        echo "Please configure trusted publisher on PyPI with these details:"
+        echo "- Repository: TheLustriVA/PyVenice"
+        echo "- Workflow: .github/workflows/build-wheels.yml"
+        echo "- Environment: pypi"
+        echo ""
+        echo "📦 Built artifacts ready for upload:"
+        ls -la dist/
+    
     - uses: pypa/gh-action-pypi-publish@release/v1
+      continue-on-error: true

@@ -97,8 +97,13 @@ class UpscaleImageRequest(BaseModel):
 
 class EditImageRequest(BaseModel):
     """Request model for image editing."""
-    
-    prompt: str = Field(..., min_length=1, max_length=1500, description="Text directions to edit or modify the image")
+
+    prompt: str = Field(
+        ...,
+        min_length=1,
+        max_length=1500,
+        description="Text directions to edit or modify the image",
+    )
     image: Union[str, bytes]  # Base64 string, binary data, or URL
 
 
@@ -372,14 +377,14 @@ class ImageGeneration(BaseResource):
     ) -> bytes:
         """
         Edit or modify an image based on a text prompt.
-        
+
         Args:
             prompt: Text description of desired edits (max 1500 chars).
             image: Image to edit (base64, bytes, file path, or file object).
-            
+
         Returns:
             Edited image as bytes.
-            
+
         Example:
             >>> # Edit from file
             >>> edited_image = image_gen.edit(
@@ -397,7 +402,9 @@ class ImageGeneration(BaseResource):
             image = base64.b64encode(image.read()).decode()
         elif isinstance(image, bytes):
             image = base64.b64encode(image).decode()
-        elif isinstance(image, str) and not image.startswith(("http://", "https://", "data:")):
+        elif isinstance(image, str) and not image.startswith(
+            ("http://", "https://", "data:")
+        ):
             # Assume it's a file path if it's a string but not a URL or base64 data URI
             try:
                 with open(image, "rb") as f:
@@ -437,7 +444,9 @@ class ImageGeneration(BaseResource):
             image = base64.b64encode(image.read()).decode()
         elif isinstance(image, bytes):
             image = base64.b64encode(image).decode()
-        elif isinstance(image, str) and not image.startswith(("http://", "https://", "data:")):
+        elif isinstance(image, str) and not image.startswith(
+            ("http://", "https://", "data:")
+        ):
             # Assume it's a file path if it's a string but not a URL or base64 data URI
             try:
                 with open(image, "rb") as f:

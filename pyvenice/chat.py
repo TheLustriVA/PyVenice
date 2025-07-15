@@ -97,7 +97,11 @@ class ChatCompletionRequest(BaseModel):
     # Optional parameters
     frequency_penalty: Optional[float] = Field(None, ge=-2.0, le=2.0)
     logprobs: Optional[bool] = None
-    top_logprobs: Optional[int] = Field(None, ge=0, description="Number of highest probability tokens to return for each token position")
+    top_logprobs: Optional[int] = Field(
+        None,
+        ge=0,
+        description="Number of highest probability tokens to return for each token position",
+    )
     max_completion_tokens: Optional[int] = None
     max_temp: Optional[float] = Field(None, ge=0.0, le=2.0)
     max_tokens: Optional[int] = None  # Deprecated, use max_completion_tokens

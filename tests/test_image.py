@@ -7,7 +7,12 @@ import base64
 from pathlib import Path
 from unittest.mock import patch, mock_open
 
-from pyvenice.image import ImageGeneration, GenerateImageRequest, OpenAIImageRequest, EditImageRequest
+from pyvenice.image import (
+    ImageGeneration,
+    GenerateImageRequest,
+    OpenAIImageRequest,
+    EditImageRequest,
+)
 from pyvenice.client import VeniceClient
 from pydantic import ValidationError
 
@@ -361,7 +366,7 @@ class TestImageIntegration:
 @pytest.mark.unit
 class TestImageEdit:
     """Test image editing functionality."""
-    
+
     @respx.mock
     def test_edit_image_basic(self, respx_mock, client):
         """Test basic image editing."""
@@ -372,17 +377,17 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
-        
+
         # Test with base64 string
         result = image_gen.edit(
             prompt="Make the sky blue",
-            image="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA0"
+            image="iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAGA0",
         )
-        
+
         assert result == fake_edited_image
-    
+
     @respx.mock
     def test_edit_image_with_bytes(self, respx_mock, client):
         """Test image editing with bytes input."""
@@ -392,17 +397,14 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
         input_bytes = b"fake-input-image-data"
-        
-        result = image_gen.edit(
-            prompt="Change the lighting",
-            image=input_bytes
-        )
-        
+
+        result = image_gen.edit(prompt="Change the lighting", image=input_bytes)
+
         assert result == fake_edited_image
-    
+
     @patch("builtins.open", new_callable=mock_open, read_data=b"fake-file-data")
     @respx.mock
     def test_edit_image_from_file(self, mock_file, respx_mock, client):
@@ -413,17 +415,16 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
-        
+
         result = image_gen.edit(
-            prompt="Add a rainbow",
-            image=Path("/fake/path/input.jpg")
+            prompt="Add a rainbow", image=Path("/fake/path/input.jpg")
         )
-        
+
         assert result == fake_edited_image
         mock_file.assert_called_once_with(Path("/fake/path/input.jpg"), "rb")
-    
+
     @respx.mock
     def test_edit_image_file_path_as_string(self, respx_mock, client):
         """Test image editing with file path as string."""
@@ -433,17 +434,16 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
-        
+
         with patch("builtins.open", mock_open(read_data=b"fake-file-data")):
             result = image_gen.edit(
-                prompt="Change colors",
-                image="/fake/path/input.jpg"
+                prompt="Change colors", image="/fake/path/input.jpg"
             )
-        
+
         assert result == fake_edited_image
-    
+
     @respx.mock
     def test_edit_image_url_handling(self, respx_mock, client):
         """Test that URLs are passed through without file processing."""
@@ -453,19 +453,19 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
-        
+
         result = image_gen.edit(
-            prompt="Enhance image",
-            image="https://example.com/image.jpg"
+            prompt="Enhance image", image="https://example.com/image.jpg"
         )
-        
+
         assert result == fake_edited_image
-        
+
         # Verify the request was made with the URL directly
         request = respx_mock.calls[-1].request
         import json
+
         request_body = json.loads(request.content)
         assert request_body["image"] == "https://example.com/image.jpg"
 
@@ -479,58 +479,50 @@ class TestImageEdit:
                 200, content=fake_edited_image, headers={"content-type": "image/png"}
             )
         )
-        
+
         image_gen = ImageGeneration(client)
-        
+
         result = await image_gen.edit_async(
-            prompt="Make it artistic",
-            image="base64_encoded_image_data"
+            prompt="Make it artistic", image="base64_encoded_image_data"
         )
-        
+
         assert result == fake_edited_image
 
 
 @pytest.mark.unit
 class TestEditImageRequestValidation:
     """Test EditImageRequest validation."""
-    
+
     def test_edit_image_request_valid(self):
         """Test valid edit image request."""
         request = EditImageRequest(
-            prompt="Change the sky color",
-            image="base64_encoded_image_data"
+            prompt="Change the sky color", image="base64_encoded_image_data"
         )
-        
+
         assert request.prompt == "Change the sky color"
         assert request.image == "base64_encoded_image_data"
-    
+
     def test_edit_image_request_empty_prompt(self):
         """Test edit image request with empty prompt."""
         with pytest.raises(ValidationError) as exc_info:
-            EditImageRequest(
-                prompt="",
-                image="base64_data"
-            )
-        
+            EditImageRequest(prompt="", image="base64_data")
+
         assert "at least 1 character" in str(exc_info.value)
-    
+
     def test_edit_image_request_long_prompt(self):
         """Test edit image request with too long prompt."""
         long_prompt = "x" * 1501  # Exceeds 1500 character limit
-        
+
         with pytest.raises(ValidationError) as exc_info:
-            EditImageRequest(
-                prompt=long_prompt,
-                image="base64_data"
-            )
-        
+            EditImageRequest(prompt=long_prompt, image="base64_data")
+
         assert "at most 1500 characters" in str(exc_info.value)
-    
+
     def test_edit_image_request_missing_fields(self):
         """Test edit image request with missing required fields."""
         with pytest.raises(ValidationError):
             EditImageRequest(prompt="test")  # Missing image
-        
+
         with pytest.raises(ValidationError):
             EditImageRequest(image="base64_data")  # Missing prompt
 
@@ -538,42 +530,38 @@ class TestEditImageRequestValidation:
 @pytest.mark.integration
 class TestImageEditIntegration:
     """Integration tests for image editing (requires API key)."""
-    
+
     def test_real_image_edit(self, skip_if_no_api_key, integration_api_key):
         """Test real image editing with Venice.ai API."""
         client = VeniceClient(api_key=integration_api_key)
         image_gen = ImageGeneration(client)
-        
+
         # Use a simple base64 encoded 1x1 pixel PNG image for testing
         tiny_image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        
-        result = image_gen.edit(
-            prompt="Make this image blue",
-            image=tiny_image
-        )
-        
+
+        result = image_gen.edit(prompt="Make this image blue", image=tiny_image)
+
         assert isinstance(result, bytes)
         assert len(result) > 0
-        
+
         # Verify it's PNG data (starts with PNG header)
-        assert result.startswith(b'\x89PNG\r\n\x1a\n')
-    
+        assert result.startswith(b"\x89PNG\r\n\x1a\n")
+
     @pytest.mark.asyncio
     async def test_real_image_edit_async(self, skip_if_no_api_key, integration_api_key):
         """Test real async image editing with Venice.ai API."""
         client = VeniceClient(api_key=integration_api_key)
         image_gen = ImageGeneration(client)
-        
+
         # Use a simple base64 encoded 1x1 pixel PNG image for testing
         tiny_image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        
+
         result = await image_gen.edit_async(
-            prompt="Add bright colors",
-            image=tiny_image
+            prompt="Add bright colors", image=tiny_image
         )
-        
+
         assert isinstance(result, bytes)
         assert len(result) > 0
-        
+
         # Verify it's PNG data (starts with PNG header)
-        assert result.startswith(b'\x89PNG\r\n\x1a\n')
+        assert result.startswith(b"\x89PNG\r\n\x1a\n")
