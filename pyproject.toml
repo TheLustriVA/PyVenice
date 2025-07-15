@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyvenice"
-version = "0.3.0"
+version = "0.3.1"
 description = "A comprehensive Python client for the Venice.ai API with automatic parameter validation"
 readme = "README.md"
 license = "MIT"
