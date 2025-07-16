@@ -9,6 +9,16 @@
             "date": 1752513599664,
             "name": "/home/websinthe/code/pyvenice/logs/mcp-puppeteer-2025-07-15.log",
             "hash": "8885d7636bcdde2d3bb30e01d37de00db95e267471c72e11640eb096268a8ed7"
+        },
+        {
+            "date": 1752668295293,
+            "name": "/home/websinthe/code/pyvenice/logs/mcp-puppeteer-2025-07-16.log",
+            "hash": "74f2bd0986d963a96881d850990c3b09de404ec060c9f59da1c48f59eb20fe4e"
+        },
+        {
+            "date": 1752695168793,
+            "name": "/home/websinthe/code/pyvenice/logs/mcp-puppeteer-2025-07-17.log",
+            "hash": "2610967b8a5305ca0c3c270a575f401fb32f9fe9730a416b3badc4f5363d51c9"
         }
     ],
     "hashType": "sha256"

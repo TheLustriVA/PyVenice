@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Setup Checklist
 
 **ALWAYS verify when starting work on a new project:**
+
 - [ ] GRIMOIRE.md symlinked: `ls -la GRIMOIRE.md` (should show symlink to ~/code/central_projections/GRIMOIRE.md)
 - [ ] If missing: `ln -s ~/code/central_projections/GRIMOIRE.md ./GRIMOIRE.md`
 - [ ] Remind user if symlink is missing or broken
@@ -18,6 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **IMPORTANT**: This library has two distinct user groups with different needs:
 
 ### **End Users** (Library Consumers)
+
 - Install via `pip install pyvenice`
 - Use the library for Venice.ai API integration
 - Get clear error messages if version incompatible with API
@@ -25,6 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Do NOT need**: API monitoring, model updating, or maintainer automation
 
 ### **Maintainer** (Library Developer)
+
 - Monitor Venice.ai API changes via automation scripts
 - Update PyVenice when API evolves
 - Release new versions to PyPI
@@ -34,6 +37,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Roadmap
 
 **Note**: Comprehensive roadmap was moved to central project repository.
+
 - Documentation and wiki development plans
 - Feature enhancement priorities  
 - Community growth strategies
@@ -52,11 +56,13 @@ The library implements a **decorator-based validation pattern** that requires un
 ## Distribution Infrastructure (v0.2.0+)
 
 **Multi-Platform Support**: Professional CI/CD pipeline with ARM64 wheel building solves Termux/Android installation issues:
+
 - GitHub Actions builds wheels for Linux/macOS/Windows on x86_64 and ARM64
 - Docker images published to GitHub Container Registry with multi-arch support
 - Conda-forge recipe ready for scientific Python ecosystem submission
 
 **Security Framework**: Automated vulnerability scanning and structured threat modeling:
+
 - Daily security scans with Safety, Bandit, Semgrep, pip-audit
 - Tiered security assessment (individual/corporate/nation-state threats)
 - Professional security documentation and incident response procedures
@@ -64,6 +70,7 @@ The library implements a **decorator-based validation pattern** that requires un
 ## Essential Commands
 
 ### **For End Users** (Library Development)
+
 ```bash
 # Development setup
 source .venv/bin/activate      # Activate uv virtual environment
@@ -85,6 +92,7 @@ python src/example_usage.py   # Comprehensive API demonstration
 ```
 
 ### **For Maintainer Only** (API Maintenance)
+
 ```bash
 # Security scanning
 scripts/security-scan.sh      # Local security audit (Safety, Bandit, Semgrep)
@@ -148,10 +156,12 @@ docker build -t pyvenice:test .               # Test Docker image build
 - **Production-Ready Automation**: Can run unattended with `AUTO_COMMIT=true`
 
 **Architecture Philosophy**:
+
 - **End Users**: Install library → Use library → Get clear errors if incompatible → Upgrade when needed
 - **Maintainer**: Monitor API → Update library → Release new version → Users benefit automatically
 
 **Previous Infrastructure (v0.2.0)**:
+
 - **ARM64 Support**: Wheel building solves Android/Termux installation issues  
 - **Security Framework**: Automated scanning with tiered threat assessment
 - **Distribution Ready**: Conda-forge recipe prepared, Docker images published
@@ -162,11 +172,13 @@ docker build -t pyvenice:test .               # Test Docker image build
 **Follow these 3 rules to avoid edit loops and file corruption:**
 
 ### Rule 1: Read First, Edit Second
+
 - **Always use `Read` tool** to understand context before any `Edit`
 - **Check ±10 lines** around target location for conflicts
 - **Understand the structure** before making changes
 
 ### Rule 2: Verify Target Uniqueness  
+
 - **Use `grep -n "target_string" file`** to check uniqueness before Edit
 - **If multiple matches**: Use more context or different strategy
 - **Tool selection**:
@@ -175,12 +187,14 @@ docker build -t pyvenice:test .               # Test Docker image build
   - `Write` - For complete file rewrites (rare)
 
 ### Rule 3: Verify Immediately After Changes
+
 - **Syntax check**: `python -c "import module"` right after edit
 - **Placement check**: `grep -n "new_code"` to confirm location  
 - **Duplicate check**: `grep -c "function_name"` should equal 1
 - **If ANY check fails**: `git checkout -- file` and restart
 
 ### Emergency Recovery
+
 - **Before risky edits**: `git stash push -m "backup"`
 - **If stuck in loop**: `git checkout -- file` to reset
 - **Nuclear option**: `git stash pop` to restore backup
@@ -192,27 +206,32 @@ docker build -t pyvenice:test .               # Test Docker image build
 ## Automated API Maintenance System (v0.3.0) - MAINTAINER ONLY
 
 ### Overview
+
 Complete zero-manual-review pipeline for handling Venice.ai API changes. **This is maintainer-only infrastructure** - end users of the library don't need to interact with this system. Designed specifically for developers with ADHD/PTSD who cannot reliably review generated code. System prioritizes safety through automation rather than human oversight.
 
 ### System Architecture
 
 **1. Detection Layer**
+
 - `api-monitor.py`: Parameter-level change tracking with version history
 - `docs-scraper.py`: Enhanced data from Venice.ai documentation pages
 - `schema-diff.py`: Detailed analysis of specific changes between versions
 
-**2. Safety Validation Layer** 
+**2. Safety Validation Layer**
+
 - `safety-validator.py`: Multi-layered validation (syntax, imports, tests, linting, API compatibility)
 - `api-contract-validator.py`: Live API testing with backwards compatibility verification
 - `dead-code-detector.py`: Identifies safe-to-remove unused code
 - `ci-feedback.py`: Real-time CI/CD monitoring with failure classification
 
 **3. Code Generation Layer**
+
 - `generate-endpoint.py`: AI-optimized discrete tasks (additive vs modification detection)
 - Deprecation system with graceful parameter removal
 - Automatic backup creation for rollback safety
 
 **4. Deployment Layer**
+
 - `safe-auto-deploy.py`: Complete pipeline with branch isolation and automatic rollback
 - CI/CD integration with workflow completion monitoring
 - Comprehensive audit trails for debugging
@@ -228,6 +247,7 @@ Complete zero-manual-review pipeline for handling Venice.ai API changes. **This 
 5. **CI/CD Validation**: Waits for all workflows to pass before proceeding
 
 **Risk Mitigation**:
+
 - Syntax errors caught by AST parsing
 - Import errors caught by test imports
 - API compatibility validated against live endpoints
@@ -237,6 +257,7 @@ Complete zero-manual-review pipeline for handling Venice.ai API changes. **This 
 ### Usage Patterns
 
 **Daily Automated Run** (Recommended):
+
 ```bash
 # Set up daily cron job
 0 9 * * * cd /path/to/project && python scripts/safe-auto-deploy.py
@@ -246,6 +267,7 @@ python scripts/safe-auto-deploy.py
 ```
 
 **Manual Validation** (When needed):
+
 ```bash
 # Check if it's safe to deploy
 python scripts/ci-feedback.py --check-safety
@@ -258,6 +280,7 @@ python scripts/api-contract-validator.py
 ```
 
 **Emergency Procedures**:
+
 ```bash
 # If deployment fails, backup location is logged
 python scripts/safety-validator.py --restore /tmp/backup_path
@@ -270,6 +293,7 @@ python scripts/safe-auto-deploy.py
 ### Failure Handling
 
 **Automatic Rollback Triggers**:
+
 - Any syntax error in generated code
 - Import failures after code changes  
 - Test suite failures
@@ -278,6 +302,7 @@ python scripts/safe-auto-deploy.py
 - CI/CD workflow failures
 
 **Failure Classification**:
+
 - `test_failure`: Code broke existing functionality
 - `syntax_error`: Generated code has syntax issues
 - `import_error`: Dependency or module issues
@@ -287,28 +312,33 @@ python scripts/safe-auto-deploy.py
 ### Key Files and Data
 
 **Generated Artifacts**:
+
 - `docs/api_changes.json`: Historical change log with parameter tracking
 - `docs/api_update_report.md`: Human-readable change analysis
 - `docs/deprecated_params.json`: Deprecation configuration
 - `docs/last_deployment_report.md`: Latest deployment audit trail
 
 **Backup Locations**:
+
 - `/tmp/pyvenice_backup_*`: Safety backups (auto-cleaned after success)
 - `/tmp/claude_prompt_*.md`: Generated AI tasks for manual review if needed
 
 ### Integration Points
 
 **GitHub Actions**: `.github/workflows/api-monitor.yml`
+
 - Daily automated monitoring
 - Issue creation for detected changes
 - Automatic PR creation with safety validations
 
 **Local Development**: `scripts/daily-monitor.sh`
+
 - Cron-compatible monitoring script
 - Email/notification integration points
 - Manual override capabilities
 
 **CI/CD Feedback**: Real-time workflow monitoring
+
 - Success rate tracking
 - Failure pattern analysis
 - Go/no-go deployment decisions
@@ -316,16 +346,19 @@ python scripts/safe-auto-deploy.py
 ### Troubleshooting
 
 **System Not Running**:
+
 1. Check prerequisites: `python scripts/safe-auto-deploy.py` (will validate tools)
 2. Verify API key: `echo $VENICE_API_KEY`
 3. Check CI/CD status: `python scripts/ci-feedback.py --check-safety`
 
 **Validation Failures**:
+
 1. Check latest report: `cat docs/last_deployment_report.md`
 2. Review specific failure: `python scripts/safety-validator.py`
 3. Test manual API compatibility: `python scripts/api-contract-validator.py`
 
 **Code Generation Issues**:
+
 1. Check generated tasks: `ls /tmp/claude_prompt_*.md`
 2. Manual task execution: `claude-code "$(cat /tmp/claude_prompt_1.md)"`
 3. Validate result: `python scripts/safety-validator.py`
@@ -333,16 +366,19 @@ python scripts/safe-auto-deploy.py
 ### Performance Characteristics
 
 **Runtime**: Full pipeline takes 5-15 minutes depending on:
+
 - Number of API changes detected
 - Test suite execution time  
 - CI/CD workflow completion time
 
 **Resource Usage**: Minimal - primarily I/O bound
+
 - Backup storage: ~50MB per deployment
 - Network: API calls for monitoring and validation
 - CPU: Test suite and validation processes
 
 **Reliability**: Designed for 99%+ success rate on valid API changes
+
 - False positives (blocks valid changes): <1%
 - False negatives (allows bad changes): <0.1% target
 

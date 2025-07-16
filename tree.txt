@@ -1,0 +1,160 @@
+.
+├── CHANGELOG.md
+├── CLAUDE.md
+├── conda-recipe
+│   └── pyvenice
+├── CONTRIBUTING.md
+├── dist
+│   ├── pyvenice-0.1.0-py3-none-any.whl
+│   └── pyvenice-0.1.0.tar.gz
+├── Dockerfile
+├── docs
+│   ├── api_changes.json
+│   ├── API_COVERAGE_REPORT.md
+│   ├── api_update_report.md
+│   ├── architecture.md
+│   ├── changelog_changes.json
+│   ├── changelog_history.json
+│   ├── changelog_monitoring_report.json
+│   ├── CI_CD_IMPLEMENTATION_PLAN.md
+│   ├── deprecated_params.json
+│   ├── doc_notes.md
+│   ├── IMPLEMENTATION_STATUS.md
+│   ├── INSTALLATION_TROUBLESHOOTING.md
+│   ├── model_audit_report.json
+│   ├── model_update_report.json
+│   ├── monitoring_report.json
+│   ├── monitoring_report.md
+│   ├── NEXT_SESSION_TASKS.md
+│   ├── PYPI_SETUP.md
+│   ├── response_schemas.json
+│   ├── schema_monitoring_report.json
+│   ├── SECURITY_AUDIT_PLAN.md
+│   ├── SESSION_HANDOVER.md
+│   ├── swagger_current.yaml
+│   ├── swagger.yaml
+│   ├── venice_changelog_debug.html
+│   └── venice_changelog_debug.png
+├── estimates
+│   ├── 20250625_answers.md
+│   ├── ACCURACY.md
+│   ├── anthropic-support-email.md
+│   ├── black_output.txt
+│   ├── cicd_questions.txt
+│   ├── NEXT_SESSION_CHECKLIST.md
+│   ├── ruff_output.txt
+│   └── tone-calibration-example.md
+├── fix_venv.sh
+├── GRIMOIRE.md -> /home/websinthe/code/central_projections/GRIMOIRE.md
+├── LICENSE
+├── logs
+│   ├── mcp-puppeteer-2025-07-15.log
+│   └── mcp-puppeteer-2025-07-16.log
+├── main.py
+├── MANIFEST.in
+├── outputs
+│   ├── image_0_20250715_130543.png
+│   ├── image_0_20250715_130552.png
+│   ├── image_0_20250715_130600.png
+│   ├── image_0_20250715_130610.png
+│   ├── image_0_20250715_130620.png
+│   ├── image_0_20250715_130628.png
+│   ├── image_0_20250715_130636.png
+│   ├── image_0_20250715_130647.png
+│   ├── image_0_20250715_130703.png
+│   ├── image_0_20250715_130712.png
+│   ├── image_0_20250715_130728.png
+│   ├── image_metadata_20250715_130543.json
+│   ├── image_metadata_20250715_130552.json
+│   ├── image_metadata_20250715_130600.json
+│   ├── image_metadata_20250715_130610.json
+│   ├── image_metadata_20250715_130620.json
+│   ├── image_metadata_20250715_130628.json
+│   ├── image_metadata_20250715_130636.json
+│   ├── image_metadata_20250715_130647.json
+│   ├── image_metadata_20250715_130703.json
+│   ├── image_metadata_20250715_130712.json
+│   └── image_metadata_20250715_130728.json
+├── PROCEDURES.md -> /home/websinthe/code/Central-Projections/PROCEDURES.md
+├── __pycache__
+│   ├── monitor_test.cpython-313-pytest-8.4.0.pyc
+│   └── test_monitor.cpython-313-pytest-8.4.0.pyc
+├── pyproject.toml
+├── pytest.ini
+├── pyvenice
+│   ├── api_keys.py
+│   ├── audio.py
+│   ├── billing.py
+│   ├── characters.py
+│   ├── chat.py
+│   ├── client.py
+│   ├── deprecation.py
+│   ├── embeddings.py
+│   ├── exceptions.py
+│   ├── image.py
+│   ├── __init__.py
+│   ├── models.py
+│   ├── __pycache__
+│   ├── py.typed
+│   └── validators.py
+├── pyvenice.egg-info
+│   ├── dependency_links.txt
+│   ├── PKG-INFO
+│   ├── requires.txt
+│   ├── SOURCES.txt
+│   └── top_level.txt
+├── README.md
+├── results
+│   ├── bandit.json
+│   ├── pip-audit.json
+│   └── semgrep.json
+├── scripts
+│   ├── api-contract-validator.py
+│   ├── api-monitor.py
+│   ├── architecture.md
+│   ├── changelog-monitor.py
+│   ├── ci-feedback.py
+│   ├── daily-monitor.sh
+│   ├── dead-code-detector.py
+│   ├── docs-scraper.py
+│   ├── generate-endpoint.py
+│   ├── model-audit.py
+│   ├── model-updater.py
+│   ├── monitor_checker.py
+│   ├── monitoring-report.py
+│   ├── publish.sh
+│   ├── __pycache__
+│   ├── response-schema-monitor.py
+│   ├── safe-auto-deploy.py
+│   ├── safety-validator.py
+│   ├── schema-diff.py
+│   └── security-scan.sh
+├── SESSION_1_FOUNDATION_DEPENDENCIES.md
+├── SESSION_2_SCHEMA_FIXES.md
+├── SESSION_3_IMAGE_EDIT_ENDPOINT.md
+├── SESSION_4_API_KEY_MANAGEMENT.md
+├── SESSION_5_MONITORING_IMPROVEMENTS.md
+├── SESSION_OVERVIEW.md
+├── src
+│   ├── example_usage.py
+│   ├── __pycache__
+│   ├── pyvenice_oldschool_banner.png
+│   └── simple_example.py
+├── tests
+│   ├── conftest.py
+│   ├── __init__.py
+│   ├── __pycache__
+│   ├── test_api_keys.py
+│   ├── test_audio.py
+│   ├── test_billing.py
+│   ├── test_chat.py
+│   ├── test_client.py
+│   ├── test_embeddings.py
+│   ├── test_image.py
+│   ├── test_models.py
+│   └── test_validators.py
+├── tree.txt
+├── uv.lock
+└── wheelhouse
+
+20 directories, 138 files
